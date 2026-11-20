@@ -1,6 +1,10 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import { prisma, parseJson } from "@/lib/db";
 import type { CaseContent, Difficulty } from "@/lib/sim/types";
+import { DRAFT_SLUGS } from "./drafts";
+
+/** Library visibility: published cases plus the source-traceable drafts under clinical review (shown with a draft label). */
+export const LIBRARY_WHERE: Prisma.ClinicalCaseWhereInput = { OR: [{ status: "PUBLISHED" }, { status: "IN_REVIEW", slug: { in: [...DRAFT_SLUGS] } }] };
 
 export interface CaseMeta {
   slug: string;
@@ -108,7 +112,7 @@ export interface LibraryFilters {
 }
 
 export async function listPublishedCases(f: LibraryFilters) {
-  const where: Prisma.ClinicalCaseWhereInput = { status: "PUBLISHED" };
+  const where: Prisma.ClinicalCaseWhereInput = { AND: [LIBRARY_WHERE] };
   if (f.specialty) where.specialty = f.specialty;
   if (f.difficulty) where.difficulty = f.difficulty;
   if (f.age === "child") where.patientAge = { lt: 18 };
@@ -117,12 +121,12 @@ export async function listPublishedCases(f: LibraryFilters) {
   if (f.maxMinutes) where.estimatedMinutes = { lte: f.maxMinutes };
   if (f.symptom) where.symptoms = { some: { name: { contains: f.symptom.toLowerCase() } } };
   if (f.q) {
-    where.OR = [
+    (where.AND as Prisma.ClinicalCaseWhereInput[]).push({ OR: [
       { title: { contains: f.q } },
       { summary: { contains: f.q } },
       { learningObjectives: { contains: f.q } },
       { symptoms: { some: { name: { contains: f.q.toLowerCase() } } } },
-    ];
+    ] });
   }
   return prisma.clinicalCase.findMany({
     where,

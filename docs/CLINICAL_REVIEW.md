@@ -12,9 +12,9 @@ supervised practice on a model or in a clinical setting.
 | Who | Draft cases and workshops |
 | --- | --- |
 | Teachers, institution admins, platform admins | Always visible and playable, so they can review them |
-| Students | Listed with a "Draft" badge but **locked**, until an admin turns on *Admin → Settings → Student access to drafts* |
+| Students | Shown in the main library with their photo and a "Draft" badge, and **playable** (owner's choice). An admin can lock them again with *Admin → Settings → Student access to drafts* |
 
-Turn on student access only if the faculty accepts unreviewed material for supervised pilots.
+The draft banner stays on the case page, in the consultation room and in the report until the case is approved.
 
 ## What every activity contains
 
@@ -36,8 +36,7 @@ Turn on student access only if the faculty accepts unreviewed material for super
 
 ## How to review a case
 
-1. Open **Teach → Cases**, tab *In review*. Each case also appears in the library under
-   "Nouveaux cas sourcés — en relecture clinique".
+1. Open **Teach → Cases**, tab *In review*. Each case also appears in the library with a "Brouillon" badge.
 2. Play the case from start to finish, then read the report: score breakdown, debrief, references.
 3. Check every item in "Requires clinical educator review". Supply local content where it is requested:
    - Sepsis pathway.
