@@ -16,3 +16,4 @@ prisma/schema.postgres.prisma
 # reel: intermediate render files
 marketing/reel/build/
 __pycache__/
+prisma/schema.mysql.prisma

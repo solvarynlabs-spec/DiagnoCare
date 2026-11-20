@@ -17,7 +17,8 @@
     "vercel-build": "node scripts/pg-schema.mjs && prisma generate --schema prisma/schema.postgres.prisma && next build",
     "db:prod:push": "node scripts/pg-schema.mjs && prisma db push --schema prisma/schema.postgres.prisma",
     "db:prod:seed": "tsx prisma/seed-prod.ts",
-    "deploy": "vercel deploy --prod"
+    "deploy": "vercel deploy --prod",
+    "build:hostinger": "node scripts/mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && prisma db push --schema prisma/schema.mysql.prisma --skip-generate && tsx prisma/seed-prod.ts && next build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
