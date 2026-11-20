@@ -10,6 +10,8 @@ const nextConfig = (phase) => ({
   // Vercel expects the standard ".next" folder.
   distDir: process.env.NEXT_DIST_DIR || (process.env.VERCEL || phase === PHASE_DEVELOPMENT_SERVER ? ".next" : ".next-prod"),
   poweredByHeader: false,
+  // Hostinger serves Next.js from the standalone server bundle (.next/standalone/server.js).
+  ...(process.env.STANDALONE_BUILD === "1" ? { output: "standalone" } : {}),
   images: { remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }] },
   // Tree-shake big barrels so each route compiles only what it uses.
   experimental: {
