@@ -1,0 +1,7 @@
+{
+  "domain": "diagnocare.site",
+  "username": "u613633953",
+  "type": "nodejs",
+  "build_script": "build:hostinger",
+  "git": { "owner": "solvarynlabs-spec", "repository": "DiagnoCare", "branch": "main" }
+}

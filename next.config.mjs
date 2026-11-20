@@ -12,7 +12,11 @@ const nextConfig = (phase) => ({
   poweredByHeader: false,
   images: { remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }] },
   // Tree-shake big barrels so each route compiles only what it uses.
-  experimental: { optimizePackageImports: ["@react-three/drei", "three-stdlib", "framer-motion", "recharts"] },
+  experimental: {
+    optimizePackageImports: ["@react-three/drei", "three-stdlib", "framer-motion", "recharts"],
+    // Shared hosting (Hostinger) caps threads per account: build on one CPU without worker threads.
+    ...(process.env.LOW_RESOURCE_BUILD === "1" ? { cpus: 1, workerThreads: false, webpackBuildWorker: false } : {}),
+  },
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
   async headers() {
     return [

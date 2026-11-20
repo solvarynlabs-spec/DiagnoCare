@@ -5,6 +5,9 @@ import { execSync } from "node:child_process";
 
 if (process.env.DATABASE_URL) process.env.DATABASE_URL = process.env.DATABASE_URL.replace("@localhost:", "@127.0.0.1:");
 
+// Hostinger caps threads per account: keep Next.js on one CPU without worker threads.
+process.env.LOW_RESOURCE_BUILD = "1";
+
 const run = (cmd) => {
   console.log(`\n> ${cmd}`);
   execSync(cmd, { stdio: "inherit", env: process.env });
