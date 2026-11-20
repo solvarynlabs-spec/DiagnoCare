@@ -22,9 +22,11 @@ const Body = z.object({
 
 export const POST = handle(async (req: Request) => {
   const ip = await clientIp();
-  if (!rateLimit(`register:${ip}`, 5, 60 * 60_000).ok) return NextResponse.json({ error: "Trop d'inscriptions depuis cette adresse. Réessayez plus tard." }, { status: 429 });
-
+  // Validate first: a typo (short password, missing digit…) must not use up the quota.
+  // Only well-formed sign-ups count. Students of one faculty often share a single public
+  // IP (campus network), so the limit is per IP but generous.
   const body = Body.parse(await req.json());
+  if (!rateLimit(`register:${ip}`, 20, 60 * 60_000).ok) return NextResponse.json({ error: "Trop d'inscriptions depuis cette adresse. Réessayez plus tard." }, { status: 429 });
   if (await prisma.user.findUnique({ where: { email: body.email } })) {
     return NextResponse.json({ error: "Un compte existe déjà avec cet e-mail" }, { status: 409 });
   }

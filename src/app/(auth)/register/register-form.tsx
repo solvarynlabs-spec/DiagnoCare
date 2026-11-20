@@ -31,6 +31,11 @@ export function RegisterForm({ wantsPro, google }: { wantsPro: boolean; google: 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
+    // Same rule as the server: checked here so a typo gets an immediate, clear message.
+    if (pw.length < 10 || !/[A-Za-z]/.test(pw) || !/[0-9]/.test(pw)) {
+      setError(t("Mot de passe trop faible : au moins 10 caractères, dont une lettre et un chiffre.", "Password too weak: at least 10 characters, including a letter and a number."));
+      return;
+    }
     setBusy(true);
     setError("");
     try {
