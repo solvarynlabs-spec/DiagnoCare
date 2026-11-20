@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Clinika — reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #040a17; font-family: Inter, sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  .layer { position: absolute; inset: 0; opacity: 0; will-change: opacity, transform; }
+  .bg { position: absolute; inset: -60px; background-size: cover; background-position: center; }
+  .shade { position: absolute; inset: 0; }
+  .display { font-family: "Space Grotesk", Inter, sans-serif; font-weight: 700; letter-spacing: -0.02em; }
+  .chip { display: inline-flex; align-items: center; gap: 14px; padding: 14px 26px; border-radius: 999px; font-weight: 600; font-size: 30px; }
+  #caption { position: absolute; left: 60px; right: 60px; bottom: 170px; text-align: center; font-weight: 800; font-size: 52px; line-height: 1.2; padding: 26px 30px; border-radius: 32px; background: rgba(4,10,23,0.78); box-shadow: 0 20px 60px -20px rgba(0,0,0,0.8); }
+  #caption .w { opacity: 0.28; transition: none; }
+  #caption .w.on { opacity: 1; }
+  #caption .w.hi { color: #5cc8ff; }
+  #speaker { position: absolute; left: 50%; transform: translateX(-50%); bottom: 190px; display: flex; align-items: center; gap: 14px; font-size: 28px; font-weight: 600; color: rgba(255,255,255,0.75); }
+  .bars { display: flex; gap: 5px; align-items: center; height: 34px; }
+  .bars i { width: 7px; border-radius: 4px; background: #38e1ff; display: block; }
+  .phone { position: absolute; left: 50%; top: 250px; width: 600px; height: 1240px; margin-left: -300px; border-radius: 70px; background: #0b0f17; padding: 22px; box-shadow: 0 60px 140px -30px rgba(10,91,224,0.7), inset 0 0 0 3px #232a38; }
+  .phone .screen { position: relative; width: 100%; height: 100%; border-radius: 52px; overflow: hidden; background: #050c1a; }
+  .phone .screen img { position: absolute; left: 0; width: 100%; }
+  .phone .notch { position: absolute; top: 34px; left: 50%; width: 150px; height: 36px; margin-left: -75px; border-radius: 20px; background: #0b0f17; z-index: 3; }
+  .ring { position: absolute; border-radius: 50%; border: 6px solid #38e1ff; }
+  .logo { display: flex; align-items: center; gap: 26px; }
+  #sc-demo { perspective: 1800px; }
+  .tile { position: relative; height: 300px; border-radius: 34px; overflow: hidden; background-size: cover; background-position: center; box-shadow: 0 30px 70px -25px rgba(0,0,0,0.9); }
+  .tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,10,23,0) 35%, rgba(4,10,23,0.85) 100%); }
+  .tile b { position: absolute; left: 24px; bottom: 22px; z-index: 2; font-family: "Space Grotesk", Inter, sans-serif; font-size: 40px; }
+  .feat { position: absolute; z-index: 5; padding: 22px 30px; border-radius: 28px; font-size: 36px; font-weight: 800; background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.28); backdrop-filter: blur(14px); box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8); white-space: nowrap; }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 50; }
+  #prog { position: absolute; top: 0; left: 0; height: 8px; background: linear-gradient(90deg,#38e1ff,#3d7bff); z-index: 51; border-radius: 0 6px 6px 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- ── HOOK: hallway ── -->
+  <div class="layer" id="sc-hook">
+    <div class="bg" id="bg-hook" style="background-image:url('https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&w=1400&q=80')"></div>
+    <div class="shade" style="background:linear-gradient(180deg,rgba(4,10,23,0.75) 0%,rgba(4,10,23,0.25) 35%,rgba(4,10,23,0.92) 75%)"></div>
+    <div id="hook-title" class="display" style="position:absolute;top:190px;left:70px;right:70px;font-size:92px;line-height:1.02">
+      <span style="display:block;font-size:38px;font-family:Inter;font-weight:600;color:#7fd8ff;letter-spacing:0.18em;margin-bottom:26px">EXTERNAT · ALGÉRIE</span>
+      4 ans de médecine.<br /><span style="color:#5cc8ff">0 patient.</span>
+    </div>
+  </div>
+
+  <!-- ── STAGE: bedside, forbidden to practise ── -->
+  <div class="layer" id="sc-stage">
+    <div class="bg" id="bg-stage" style="background-image:url('https://images.unsplash.com/photo-1584516150909-c43483ee7932?auto=format&fit=crop&w=1400&q=80')"></div>
+    <div class="shade" style="background:linear-gradient(180deg,rgba(4,10,23,0.55) 0%,rgba(4,10,23,0.35) 40%,rgba(4,10,23,0.95) 78%)"></div>
+    <div id="stage-chips" style="position:absolute;top:200px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:22px"></div>
+  </div>
+
+  <!-- ── FEAR: first night shift ── -->
+  <div class="layer" id="sc-fear">
+    <div class="bg" id="bg-fear" style="background-image:url('https://images.unsplash.com/photo-1512102438733-bfa4ed29aef7?auto=format&fit=crop&w=1400&q=80')"></div>
+    <div class="shade" style="background:linear-gradient(180deg,rgba(50,0,10,0.78) 0%,rgba(30,0,8,0.5) 40%,rgba(4,10,23,0.96) 78%)"></div>
+    <div class="display" style="position:absolute;top:170px;left:70px;right:70px">
+      <div style="font-family:Inter;font-weight:600;font-size:36px;letter-spacing:0.18em;color:#ff8a8a">PREMIÈRE GARDE · URGENCES</div>
+      <div id="fear-clock" style="font-size:190px;line-height:1;margin-top:14px;font-variant-numeric:tabular-nums">03<span id="fear-colon">:</span>12</div>
+    </div>
+    <svg viewBox="0 0 1080 220" style="position:absolute;top:500px;left:0;width:1080px;height:220px"><path id="fear-path" fill="none" stroke="#ff4d5e" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 12px #ff4d5e)"/></svg>
+  </div>
+
+  <!-- ── PROF ── -->
+  <div class="layer" id="sc-prof">
+    <div class="shade" style="background:radial-gradient(ellipse at 50% 30%,#123a7a 0%,#06122a 55%,#040a17 100%)"></div>
+    <div id="prof-quote" class="display" style="position:absolute;top:190px;left:80px;right:80px;font-size:78px;line-height:1.08">« Personne ne devrait apprendre sur un <span style="color:#5cc8ff">vrai patient</span>. »</div>
+    <div id="prof-logo" style="position:absolute;top:560px;left:0;right:0;display:flex;justify-content:center"></div>
+  </div>
+
+  <!-- ── CASES: specialties collage ── -->
+  <div class="layer" id="sc-cases">
+    <div class="shade" style="background:radial-gradient(ellipse at 50% 25%,#14408a 0%,#06122a 60%,#040a17 100%)"></div>
+    <div style="position:absolute;top:110px;left:0;right:0;text-align:center">
+      <div class="display" id="cases-n" style="font-size:240px;line-height:1;background:linear-gradient(180deg,#fff,#7fd8ff);-webkit-background-clip:text;color:transparent">0</div>
+      <div class="display" style="font-size:62px;margin-top:0">cas cliniques</div>
+    </div>
+    <div id="tiles" style="position:absolute;top:540px;left:60px;right:60px;display:grid;grid-template-columns:1fr 1fr;gap:26px"></div>
+  </div>
+
+  <!-- ── DEMO (phone) ── -->
+  <div class="layer" id="sc-demo">
+    <div class="shade" style="background:radial-gradient(ellipse at 50% 35%,#0f2c63 0%,#06122a 55%,#040a17 100%)"></div>
+    <div id="demo-label" class="display" style="position:absolute;top:110px;left:0;right:0;text-align:center;font-size:52px"></div>
+    <div id="glow" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(56,225,255,0.35),rgba(56,225,255,0) 55%)"></div>
+    <div class="phone" id="phone"><div class="notch"></div><div class="screen" id="screen"></div></div>
+    <div id="feats"></div>
+  </div>
+
+  <!-- ── HAPPY ── -->
+  <div class="layer" id="sc-happy">
+    <div class="bg" id="bg-happy" style="background-image:url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1400&q=80')"></div>
+    <div class="shade" style="background:linear-gradient(180deg,rgba(6,25,60,0.65) 0%,rgba(6,25,60,0.35) 40%,rgba(4,10,23,0.95) 78%)"></div>
+    <div id="sparkles"></div>
+  </div>
+
+  <!-- ── CTA ── -->
+  <div class="layer" id="sc-cta">
+    <div class="shade" style="background:radial-gradient(ellipse at 50% 40%,#1662ea 0%,#0a2f7a 40%,#040a17 85%)"></div>
+    <div id="cta-box" style="position:absolute;top:470px;left:0;right:0;display:flex;flex-direction:column;align-items:center;text-align:center"></div>
+  </div>
+
+  <!-- Characters (shared, positioned per scene) -->
+  <div id="amina" style="position:absolute;width:640px;height:800px;left:220px;top:720px;opacity:0;transform-origin:50% 100%"></div>
+  <div id="prof" style="position:absolute;width:640px;height:800px;left:220px;top:720px;opacity:0;transform-origin:50% 100%"></div>
+
+  <div id="caption"></div>
+  <div id="flash"></div>
+  <div id="prog"></div>
+  <div id="speaker"></div>
+</div>
+
+<script>
+const TL = /*__TIMELINE__*/;
+const SCREENS = /*__SCREENS__*/;
+const LOGO = '<svg viewBox="0 0 40 40" width="__S__" height="__S__"><rect width="40" height="40" rx="10" fill="#1662EA"/><path d="M40 18V30a10 10 0 0 1-10 10H18Z" fill="#0B3FA8" opacity="0.55"/><rect x="15.5" y="7.5" width="8" height="25" rx="2.4" fill="#fff"/><rect x="6.5" y="16" width="11" height="8" rx="2.4" fill="#fff"/><path d="M23.5 20h2.2l2.1-6.5 3.1 13 2.1-6.5h2.6" fill="none" stroke="#7FE7FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const logo = (s) => LOGO.replaceAll("__S__", s);
+
+// ───────────── Characters (illustrated, lip-synced) ─────────────
+function aminaSVG() {
+  return `<svg viewBox="0 0 400 500" width="640" height="800">
+    <defs>
+      <linearGradient id="coat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe6f0"/></linearGradient>
+      <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3423"/><stop offset="1" stop-color="#2e1a12"/></linearGradient>
+      <radialGradient id="skin" cx="0.5" cy="0.4" r="0.65"><stop offset="0" stop-color="#f6cfae"/><stop offset="1" stop-color="#e5ad86"/></radialGradient>
+    </defs>
+    <g id="a-body">
+      <path d="M40 500 C40 400 110 360 200 360 C290 360 360 400 360 500 Z" fill="url(#coat)"/>
+      <path d="M152 366 L200 456 L248 366 C234 362 214 360 200 360 C186 360 166 362 152 366Z" fill="#4f6fd6"/>
+      <path d="M178 366 L200 404 L222 366" fill="#e2a982"/>
+      <path d="M152 366 L178 500 L132 500 L110 394Z M248 366 L222 500 L268 500 L290 394Z" fill="#eef2f8"/>
+      <rect x="112" y="430" width="44" height="40" rx="5" fill="#e6ecf5"/><rect x="122" y="414" width="6" height="26" rx="3" fill="#4f6fd6"/><rect x="132" y="418" width="6" height="22" rx="3" fill="#1c2b4a"/>
+      <path d="M158 380 C132 418 136 454 168 468" fill="none" stroke="#2b3a55" stroke-width="7" stroke-linecap="round"/>
+      <path d="M242 380 C268 418 264 454 232 468" fill="none" stroke="#2b3a55" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="200" cy="472" r="14" fill="#c9d2df" stroke="#2b3a55" stroke-width="5"/>
+      <rect x="264" y="410" width="68" height="44" rx="7" fill="#ffffff" stroke="#c9d6ea" stroke-width="2"/>
+      <rect x="270" y="416" width="16" height="20" rx="3" fill="#4f6fd6"/>
+      <text x="290" y="429" font-size="11" fill="#13325c" font-family="Inter" font-weight="800">AMINA</text>
+      <text x="290" y="444" font-size="9" fill="#5b6b82" font-family="Inter" font-weight="700">Externe</text>
+    </g>
+    <g id="a-head">
+      <circle cx="200" cy="96" r="40" fill="url(#hair)"/>
+      <path d="M168 126 Q200 112 232 126" stroke="#4f6fd6" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <rect x="178" y="286" width="44" height="80" rx="18" fill="#e2a982"/>
+      <ellipse cx="200" cy="318" rx="26" ry="9" fill="#c98e68" opacity="0.6"/>
+      <ellipse cx="130" cy="228" rx="11" ry="18" fill="#e5ad86"/><ellipse cx="270" cy="228" rx="11" ry="18" fill="#e5ad86"/>
+      <circle cx="129" cy="246" r="4" fill="#f2cf63"/><circle cx="271" cy="246" r="4" fill="#f2cf63"/>
+      <path d="M130 212 C130 150 162 126 200 126 C238 126 270 150 270 212 C270 270 240 318 200 320 C160 318 130 270 130 212Z" fill="url(#skin)"/>
+      <path d="M124 214 C114 126 158 100 200 100 C242 100 286 126 276 214 C270 178 254 154 232 146 C214 166 168 172 140 180 C133 190 127 202 124 214Z" fill="url(#hair)"/>
+      <path d="M140 180 C150 168 176 160 196 150" stroke="#7a4a33" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round"/>
+      <path d="M126 212 C122 236 124 256 132 270 C130 246 132 228 136 214Z" fill="url(#hair)"/><path d="M274 212 C278 236 276 256 268 270 C270 246 268 228 264 214Z" fill="url(#hair)"/>
+      <g id="a-brows"><path id="a-brow-l" d="M150 190 Q170 180 188 188" stroke="#3a2117" stroke-width="5.5" fill="none" stroke-linecap="round"/><path id="a-brow-r" d="M212 188 Q230 180 250 190" stroke="#3a2117" stroke-width="5.5" fill="none" stroke-linecap="round"/></g>
+      <g id="a-eyes">
+        <path d="M148 217 Q169 198 190 217 Q169 232 148 217Z" fill="#fff"/><circle cx="169" cy="217" r="11" fill="#7a4a2a"/><circle cx="169" cy="217" r="5.5" fill="#1a0f0a"/><circle cx="173" cy="213" r="3.2" fill="#fff"/><circle cx="165" cy="221" r="1.6" fill="#fff"/>
+        <path d="M210 217 Q231 198 252 217 Q231 232 210 217Z" fill="#fff"/><circle cx="231" cy="217" r="11" fill="#7a4a2a"/><circle cx="231" cy="217" r="5.5" fill="#1a0f0a"/><circle cx="235" cy="213" r="3.2" fill="#fff"/><circle cx="227" cy="221" r="1.6" fill="#fff"/>
+        <path d="M141 210 L149 215 Q169 196 191 216" stroke="#1a0f0a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M259 210 L251 215 Q231 196 209 216" stroke="#1a0f0a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect id="a-lid-l" x="144" y="198" width="50" height="0" fill="#f0c4a1"/><rect id="a-lid-r" x="206" y="198" width="50" height="0" fill="#f0c4a1"/>
+      </g>
+      <path d="M199 242 Q196 255 203 258" stroke="#c98a63" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="152" cy="258" rx="16" ry="9" fill="#f58f8a" opacity="0.35"/><ellipse cx="248" cy="258" rx="16" ry="9" fill="#f58f8a" opacity="0.35"/>
+      <g id="a-mouth"><ellipse id="a-open" cx="200" cy="289" rx="14" ry="2" fill="#7a2630"/><path id="a-teeth" d="M189 284 L211 284" stroke="#fff" stroke-width="0" stroke-linecap="round"/><path id="a-smile" d="M180 286 Q200 298 220 286" stroke="#d0606b" stroke-width="6" fill="none" stroke-linecap="round"/></g>
+    </g>
+  </svg>`;
+}
+function profSVG() {
+  return `<svg viewBox="0 0 400 500" width="640" height="800">
+    <defs><linearGradient id="pcoat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dde4ee"/></linearGradient></defs>
+    <g id="p-body">
+      <path d="M30 500 C30 395 105 352 200 352 C295 352 370 395 370 500 Z" fill="url(#pcoat)"/>
+      <path d="M160 360 L200 440 L240 360 C226 355 214 352 200 352 C186 352 174 355 160 360Z" fill="#cfd8e6"/>
+      <path d="M192 372 L208 372 L214 470 L200 486 L186 470Z" fill="#1d3b6e"/>
+      <path d="M160 360 L184 500 L130 500 L100 392Z M240 360 L216 500 L270 500 L300 392Z" fill="#eef2f8"/>
+      <rect x="252" y="408" width="70" height="36" rx="6" fill="#d8e3f3"/><text x="287" y="432" font-size="15" text-anchor="middle" fill="#1d3b6e" font-family="Inter" font-weight="800">Pr</text>
+    </g>
+    <g id="p-head">
+      <rect x="170" y="300" width="60" height="60" rx="20" fill="#c48a63"/>
+      <ellipse cx="200" cy="215" rx="88" ry="105" fill="#cf9670"/>
+      <path d="M112 200 C108 120 150 90 200 90 C250 90 292 120 288 200 C280 160 262 140 245 136 C230 150 170 150 155 136 C138 140 120 160 112 200Z" fill="#a9b1ba"/>
+      <ellipse cx="114" cy="225" rx="12" ry="22" fill="#c48a63"/><ellipse cx="286" cy="225" rx="12" ry="22" fill="#c48a63"/>
+      <path d="M128 262 C140 315 170 330 200 330 C230 330 260 315 272 262 C262 300 235 312 200 312 C165 312 138 300 128 262Z" fill="#b8bfc8" opacity="0.9"/>
+      <g id="p-brows"><path d="M146 186 Q166 176 186 184" stroke="#8e969f" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M214 184 Q234 176 254 186" stroke="#8e969f" stroke-width="8" fill="none" stroke-linecap="round"/></g>
+      <g>
+        <ellipse cx="167" cy="212" rx="14" ry="10" fill="#fff"/><circle cx="168" cy="213" r="7" fill="#2a2a2a"/>
+        <ellipse cx="233" cy="212" rx="14" ry="10" fill="#fff"/><circle cx="234" cy="213" r="7" fill="#2a2a2a"/>
+        <rect id="p-lid-l" x="152" y="201" width="30" height="0" fill="#c58c66"/><rect id="p-lid-r" x="218" y="201" width="30" height="0" fill="#c58c66"/>
+        <rect x="140" y="194" width="54" height="38" rx="12" fill="none" stroke="#1d2533" stroke-width="5"/><rect x="206" y="194" width="54" height="38" rx="12" fill="none" stroke="#1d2533" stroke-width="5"/><path d="M194 210 L206 210" stroke="#1d2533" stroke-width="5"/>
+      </g>
+      <path d="M200 226 Q193 254 203 262" stroke="#a96f4c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M170 278 Q200 268 230 278" stroke="#9aa2ab" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <g id="p-mouth"><ellipse id="p-open" cx="200" cy="292" rx="20" ry="2" fill="#4a1a1d"/><path d="M180 290 Q200 298 220 290" stroke="#8a3a3a" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+    </g>
+  </svg>`;
+}
+
+// ───────────── Helpers ─────────────
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const fade = (t, a, b, f = 0.45) => clamp(Math.min((t - a) / f, (b - t) / f));
+
+function sceneSpan(name) {
+  const ls = TL.lines.filter((l) => l.scene === name);
+  return [ls[0].start - 0.45, ls.at(-1).start + ls.at(-1).dur + 0.35];
+}
+const SPANS = {};
+const SCENES = ["hook", "stage", "fear", "prof", "cases", "demo_chat", "demo_exam", "demo_ecg", "demo_score", "features", "happy", "cta"];
+for (const s of SCENES) SPANS[s] = sceneSpan(s);
+SPANS.hook[0] = 0;
+SPANS.cta[1] = TL.total + 1;
+const demoSpan = [SPANS.demo_chat[0], SPANS.features[1]];
+const DROP = TL.drop ?? SPANS.cases[0];
+
+const SCREEN_SCENES = ["demo_chat", "demo_exam", "demo_ecg", "demo_score", "features"];
+function lineAt(t) { return TL.lines.find((l) => t >= l.start && t < l.start + l.dur + 0.25); }
+function mouthAt(t, who) {
+  const l = TL.lines.find((x) => x.who === who && t >= x.start && t < x.start + x.dur);
+  if (!l) return 0;
+  const f = Math.floor((t - l.start) * TL.fps);
+  return l.env[f] ?? 0;
+}
+function blink(t, seed) { const p = (t + seed) % 3.7; return p < 0.12 ? Math.sin((p / 0.12) * Math.PI) : 0; }
+
+// ───────────── Build static DOM ─────────────
+$("amina").innerHTML = aminaSVG();
+$("prof").innerHTML = profSVG();
+$("stage-chips").innerHTML = ["Observer", "Écouter", "Noter"].map((x) => `<span class="chip st" style="background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25)">✓ ${x}</span>`).join("")
+  + `<span class="chip st" style="background:rgba(239,68,68,0.2);border:2px solid rgba(239,68,68,0.7);font-size:34px">✕ S'entraîner sur un patient</span>`;
+$("prof-logo").innerHTML = `<div class="logo" id="pl" style="opacity:0">${logo(120)}<span class="display" style="font-size:100px">Clinika<span style="color:#3d9bff">.</span></span></div>`;
+$("screen").innerHTML = SCREENS.map((s, i) => `<img id="scr${i}" src="${s}" style="opacity:0;top:0" />`).join("");
+$("cta-box").innerHTML = `<div id="cta-logo">${logo(220)}</div>
+  <div class="display" id="cta-name" style="font-size:150px;margin-top:40px">Clinika<span style="color:#7fe7ff">.</span></div>
+  <div id="cta-sub" style="font-size:46px;font-weight:600;margin-top:24px;color:rgba(255,255,255,0.9)">Entraîne-toi avant ta première garde.</div>
+  <div id="cta-btn" style="margin-top:70px;padding:34px 64px;border-radius:28px;background:#fff;color:#0b2f7a;font-size:46px;font-weight:800">Commencer gratuitement →</div>
+  <div id="cta-url" style="margin-top:44px;font-size:40px;font-weight:600;color:#a9d4ff">clinika-rho.vercel.app</div>`;
+$("tiles").innerHTML = [["https://images.unsplash.com/photo-1460672985063-6764ac8b9c74?auto=format&fit=crop&w=700&q=80","Cardiologie"],["https://images.unsplash.com/photo-1631563019701-efcf403bc5fe?auto=format&fit=crop&w=700&q=80","Pneumologie"],["https://images.unsplash.com/photo-1570564273767-80f85f826d7f?auto=format&fit=crop&w=700&q=80","Ophtalmologie"],["https://images.unsplash.com/photo-1528218635780-5952720c9729?auto=format&fit=crop&w=700&q=80","Gynécologie"],["https://images.unsplash.com/photo-1552256031-811fa8f0a7b1?auto=format&fit=crop&w=700&q=80","Dermatologie"],["https://images.unsplash.com/photo-1512102438733-bfa4ed29aef7?auto=format&fit=crop&w=700&q=80","Urgences"]].map(([u, n], i) => `<div class="tile" id="tile${i}" style="background-image:url('${u}');opacity:0"><b>${n}</b></div>`).join("");
+const FEATS = [["📱 Sur ton téléphone", 40, 360, "l"], ["🕐 24h/24", 40, 640, "r"], ["📍 Cas algériens", 40, 940, "l"], ["📄 Rapport PDF", 40, 1220, "r"]];
+$("feats").innerHTML = FEATS.map(([txt, x, y, side], i) => `<div class="feat" id="feat${i}" style="top:${y}px;${side === "l" ? "left" : "right"}:${x}px;opacity:0">${txt}</div>`).join("");
+$("sparkles").innerHTML = Array.from({ length: 18 }, (_, i) => `<span class="sp" style="position:absolute;left:${(i * 137) % 1000 + 40}px;top:${(i * 293) % 700 + 160}px;width:${10 + (i % 4) * 6}px;height:${10 + (i % 4) * 6}px;border-radius:50%;background:${i % 3 ? "#7fe7ff" : "#ffffff"};opacity:0"></span>`).join("");
+
+// ───────────── Frame renderer (deterministic: everything derives from t) ─────────────
+window.render = function (t) {
+  const L = (id, a) => { $(id).style.opacity = a; };
+  // Scenes
+  L("sc-hook", fade(t, SPANS.hook[0] - 1, SPANS.hook[1]));
+  L("sc-stage", fade(t, SPANS.stage[0], SPANS.stage[1]));
+  L("sc-fear", fade(t, SPANS.fear[0], SPANS.fear[1], 0.3));
+  L("sc-cases", fade(t, SPANS.cases[0], SPANS.cases[1], 0.2));
+  L("sc-prof", fade(t, SPANS.prof[0], SPANS.prof[1]));
+  L("sc-demo", fade(t, demoSpan[0], demoSpan[1]));
+  L("sc-happy", fade(t, SPANS.happy[0], SPANS.happy[1]));
+  L("sc-cta", fade(t, SPANS.cta[0], SPANS.cta[1]));
+  // Ken Burns
+  $("bg-hook").style.transform = `scale(${1.12 - 0.08 * clamp(t / 6)}) translateY(${t * 6}px)`;
+  $("bg-stage").style.transform = `scale(${1.05 + 0.06 * clamp((t - SPANS.stage[0]) / 9)})`;
+  $("bg-fear").style.transform = `scale(${1.04 + 0.08 * clamp((t - SPANS.fear[0]) / 4)})`;
+  $("fear-colon").style.opacity = Math.floor(t * 2) % 2 ? 0.2 : 1;
+  { // scrolling monitor trace, fast heart rate
+    let d = "";
+    for (let x = 0; x <= 1080; x += 6) {
+      const ph = (((x - t * 620) / 300) % 1 + 1) % 1;
+      let y = 120;
+      if (ph > 0.18 && ph < 0.26) y -= 14 * Math.sin(((ph - 0.18) / 0.08) * Math.PI);
+      else if (ph > 0.32 && ph < 0.35) y += 18 * ((ph - 0.32) / 0.03);
+      else if (ph >= 0.35 && ph < 0.39) y = 138 - 128 * Math.sin(((ph - 0.35) / 0.04) * Math.PI);
+      else if (ph >= 0.39 && ph < 0.42) y += 26 * (1 - (ph - 0.39) / 0.03);
+      else if (ph > 0.55 && ph < 0.7) y -= 22 * Math.sin(((ph - 0.55) / 0.15) * Math.PI);
+      d += (x ? "L" : "M") + x + " " + y.toFixed(1);
+    }
+    $("fear-path").setAttribute("d", d);
+  }
+  // Drop: white flash, zoom punch on the big moments, beat-synced glow
+  const sinceDrop = t - DROP;
+  $("flash").style.opacity = sinceDrop >= 0 ? Math.max(0, 0.85 * Math.exp(-sinceDrop * 7)) : 0;
+  if (t >= SPANS.cta[0]) $("flash").style.opacity = Math.max(0, 0.5 * Math.exp(-(t - SPANS.cta[0]) * 7));
+  const punch = (s) => 1 + 0.08 * (1 - ease((t - SPANS[s][0]) / 0.6));
+  $("sc-cases").style.transform = `scale(${punch("cases")})`;
+  $("sc-cta").style.transform = `scale(${punch("cta")})`;
+  const beat = sinceDrop >= 0 ? Math.exp(-(sinceDrop % 0.5) * 7) : 0;
+  $("glow").style.opacity = 0.35 + 0.55 * beat;
+  $("prog").style.width = `${(clamp(t / TL.total) * 100).toFixed(2)}%`;
+  // Cases: counter + tiles flying in
+  const ck = ease((t - SPANS.cases[0] - 0.2) / 1.6);
+  $("cases-n").textContent = Math.round(14 * ck);
+  $("cases-n").style.transform = `scale(${1 + 0.06 * beat})`;
+  for (let i = 0; i < 6; i++) {
+    const k = ease((t - SPANS.cases[0] - 0.5 - i * 0.55) / 0.5);
+    const el = $("tile" + i);
+    el.style.opacity = k;
+    el.style.transform = `translate(${(i % 2 ? 1 : -1) * (1 - k) * 260}px, ${(1 - k) * 120}px) rotate(${(i % 2 ? 1 : -1) * (1 - k) * 12}deg) scale(${0.85 + 0.15 * k})`;
+  }
+  $("bg-happy").style.transform = `scale(${1.04 + 0.05 * clamp((t - SPANS.happy[0]) / 8)})`;
+  $("hook-title").style.transform = `translateY(${(1 - ease((t - 0.2) / 0.8)) * 60}px)`;
+  $("hook-title").style.opacity = ease((t - 0.2) / 0.8);
+  // Stage chips pop in one by one, the last one is the "forbidden" one
+  [...document.querySelectorAll(".st")].forEach((el, i) => {
+    const k = ease((t - SPANS.stage[0] - 0.6 - i * 0.9) / 0.5);
+    el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * 30}px) scale(${0.9 + 0.1 * k})`;
+  });
+  // Prof logo reveal near the end of his line
+  const pLine = TL.lines.find((l) => l.scene === "prof");
+  const qk = ease((t - pLine.start - 0.2) / 0.7);
+  $("prof-quote").style.opacity = qk; $("prof-quote").style.transform = `translateY(${(1 - qk) * 40}px)`;
+  const lk = ease((t - (pLine.start + pLine.dur - 1.4)) / 0.7);
+  $("pl").style.opacity = lk; $("pl").style.transform = `scale(${0.7 + 0.3 * lk})`;
+
+  // Characters
+  const A = $("amina"), P = $("prof");
+  let aOp = 0, aX = 220, aY = 880, aS = 1, pOp = 0, pX = 220;
+  if (t < SPANS.fear[1]) { aOp = fade(t, -1, SPANS.fear[1]); aX = t < SPANS.stage[0] + 0.3 ? 220 : 220 - 160 * ease((t - SPANS.stage[0]) / 0.8); aY = 880; aS = t < SPANS.stage[0] ? 1 : 1 - 0.14 * ease((t - SPANS.stage[0]) / 0.8); }
+  if (t >= SPANS.prof[0] && t < SPANS.prof[1]) { pOp = fade(t, SPANS.prof[0], SPANS.prof[1]); pX = 380 - 60 * ease((t - SPANS.prof[0]) / 0.8); aOp = fade(t, SPANS.prof[0], SPANS.prof[1]) * 0.95; aX = -110; aY = 880; aS = 0.78; }
+  if (t >= SPANS.happy[0] && t < SPANS.happy[1]) { aOp = fade(t, SPANS.happy[0], SPANS.happy[1]); aX = 220; aY = 880 + 30 * (1 - ease((t - SPANS.happy[0]) / 0.8)); aS = 1; }
+  if (t >= SPANS.fear[0] && t < SPANS.fear[1]) aX += Math.sin(t * 37) * 2.5;
+  const bobA = Math.sin(t * 2.1) * 6, bobP = Math.sin(t * 1.7 + 1) * 5;
+  A.style.opacity = aOp; A.style.transform = `translate(${aX - 220}px, ${aY - 880 + bobA}px) scale(${aS})`;
+  P.style.opacity = pOp; P.style.transform = `translate(${pX - 220}px, ${bobP}px)`;
+
+  // Lip-sync, blinks, expressions
+  const am = mouthAt(t, "amina"), pm = mouthAt(t, "prof");
+  $("a-open").setAttribute("ry", 1.5 + am * 15);
+  $("a-teeth").setAttribute("stroke-width", am > 0.25 ? 4 : 0);
+  const happy = t >= SPANS.happy[0];
+  $("a-smile").setAttribute("d", happy ? "M172 280 Q200 312 228 280" : "M178 292 Q200 284 222 292");
+  $("a-brow-l").setAttribute("d", happy ? "M150 186 Q170 174 188 184" : "M150 184 Q170 186 188 178");
+  $("a-brow-r").setAttribute("d", happy ? "M212 184 Q230 174 250 186" : "M212 178 Q230 186 250 184");
+  const ab = blink(t, 0.3) * 24; $("a-lid-l").setAttribute("height", ab); $("a-lid-r").setAttribute("height", ab);
+  $("a-head").setAttribute("transform", `rotate(${Math.sin(t * 1.3) * 2 + am * 2} 200 300)`);
+  $("p-open").setAttribute("ry", 1.5 + pm * 14);
+  const pb = blink(t, 1.9) * 22; $("p-lid-l").setAttribute("height", pb); $("p-lid-r").setAttribute("height", pb);
+  $("p-head").setAttribute("transform", `rotate(${Math.sin(t * 1.1) * 1.6 - pm * 1.5} 200 300)`);
+
+  // Demo phone: 3D entrance, screens slide in per scene, gentle scroll
+  const pe = ease((t - demoSpan[0]) / 0.9);
+  $("phone").style.transform = `translateY(${(1 - pe) * 260}px) rotateY(${(1 - pe) * 38 + Math.sin(t * 0.9) * 4}deg) rotateX(${(1 - pe) * 10 + Math.sin(t * 0.7) * 2}deg)`;
+  SCREEN_SCENES.forEach((sc, i) => {
+    const sp = SPANS[sc];
+    const kin = i === 0 ? 1 : ease((t - sp[0] + 0.15) / 0.45);
+    const kout = i === SCREEN_SCENES.length - 1 ? 0 : ease((t - sp[1] + 0.15) / 0.45);
+    const img = $("scr" + i);
+    img.style.opacity = t > sp[0] - 0.6 && t < sp[1] + 0.6 ? 1 : 0;
+    const p = clamp((t - sp[0]) / (sp[1] - sp[0]));
+    img.style.top = `${-[260, 0, 120, 0, 420][i] * ease(p)}px`;
+    img.style.transform = `translateX(${(1 - kin) * 580 - kout * 580}px)`;
+  });
+  const demoLabels = { demo_chat: "Il te répond 💬", demo_exam: "Tu l'examines 🩺", demo_ecg: "Tu lis l'ECG 📈", demo_score: "Tu es noté ✅", features: "Partout, tout le temps ⚡" };
+  const cur = SCREEN_SCENES.find((s) => t >= SPANS[s][0] && t < SPANS[s][1]);
+  $("demo-label").textContent = cur ? demoLabels[cur] : "";
+  $("demo-label").style.transform = `scale(${1 + 0.04 * beat})`;
+  FEATS.forEach((f, i) => {
+    const k = ease((t - SPANS.features[0] - 0.2 - i * 0.45) / 0.45);
+    const el = $("feat" + i);
+    el.style.opacity = k;
+    el.style.transform = `translateX(${(f[3] === "l" ? -1 : 1) * (1 - k) * 200}px) scale(${0.8 + 0.2 * k + 0.03 * beat})`;
+  });
+
+  // Happy sparkles
+  [...document.querySelectorAll(".sp")].forEach((el, i) => {
+    const k = fade(t, SPANS.happy[0] + 0.3 + (i % 6) * 0.15, SPANS.happy[1]);
+    el.style.opacity = k * (0.5 + 0.5 * Math.sin(t * 4 + i));
+    el.style.transform = `translateY(${-((t * 40 + i * 50) % 120)}px)`;
+  });
+
+  // CTA
+  const c0 = SPANS.cta[0];
+  [["cta-logo", 0], ["cta-name", 0.35], ["cta-sub", 0.8], ["cta-btn", 1.3], ["cta-url", 1.7]].forEach(([id, d]) => {
+    const k = ease((t - c0 - d) / 0.6); $(id).style.opacity = k; $(id).style.transform = `translateY(${(1 - k) * 40}px) scale(${id === "cta-logo" ? 0.6 + 0.4 * k : 1})`;
+  });
+  $("cta-btn").style.transform += ` scale(${1 + 0.03 * Math.sin(t * 5)})`;
+
+  // Captions: words light up as they are spoken
+  const l = lineAt(t);
+  const cap = $("caption"), spk = $("speaker");
+  if (l) {
+    const words = l.caption.split(" ");
+    const p = clamp((t - l.start) / Math.max(0.5, l.dur * 0.92));
+    const n = Math.ceil(p * words.length);
+    cap.innerHTML = words.map((w, i) => `<span class="w ${i < n ? "on" : ""} ${/Clinika|patient|ECG|note|gratuit|prête|14|spécialités|téléphone|24h|peur/i.test(w) ? "hi" : ""}">${w}</span>`).join(" ");
+    cap.style.opacity = clamp((t - l.start) / 0.2) * clamp((l.start + l.dur + 0.25 - t) / 0.2);
+    const flat = /^(demo|cases|features|cta)/.test(l.scene);
+    cap.style.bottom = flat ? "110px" : "150px";
+    cap.style.background = flat ? "transparent" : "rgba(4,10,23,0.78)";
+    const names = { amina: "Amina · externe en 4e année", prof: "Pr Benali · chef de service", narrator: "Clinika" };
+    const env = l.env[Math.floor((t - l.start) * TL.fps)] ?? 0;
+    spk.innerHTML = `<span class="bars">${[0, 1, 2, 3, 4].map((i) => `<i style="height:${8 + env * (14 + ((i * 7) % 5) * 5)}px"></i>`).join("")}</span>${names[l.who]}`;
+    spk.style.opacity = cap.style.opacity;
+    spk.style.bottom = flat ? "50px" : "80px";
+  } else { cap.style.opacity = 0; spk.style.opacity = 0; }
+};
+window.ready = () => Promise.all([document.fonts.ready, ...[...document.images].map((im) => im.complete ? 1 : new Promise((r) => { im.onload = im.onerror = r; }))]);
+render(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "name": "medsim-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "preview": "next build && next start -p 3001",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:add-cases": "tsx prisma/add-cases.ts",
+    "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
+    "setup": "prisma generate && prisma db push && tsx prisma/seed.ts",
+    "vercel-build": "node scripts/pg-schema.mjs && prisma generate --schema prisma/schema.postgres.prisma && next build",
+    "db:prod:push": "node scripts/pg-schema.mjs && prisma db push --schema prisma/schema.postgres.prisma",
+    "db:prod:seed": "tsx prisma/seed-prod.ts",
+    "deploy": "vercel deploy --prod"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest",
+    "@phosphor-icons/react": "^2.1.10",
+    "@prisma/client": "^6.6.0",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.43.0",
+    "jose": "^5.9.6",
+    "lucide-react": "^0.469.0",
+    "next": "^15.3.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.0",
+    "server-only": "^0.0.1",
+    "three": "^0.170.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.170.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prisma": "^6.6.0",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "allowScripts": {
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "esbuild@0.28.2": true,
+    "prisma@6.19.3": true
+  }
+}

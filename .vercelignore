@@ -1,0 +1,9 @@
+node_modules
+.next
+.next-build
+.next-prod
+prisma/*.db
+prisma/*.db-journal
+.env
+.env.local
+.claude

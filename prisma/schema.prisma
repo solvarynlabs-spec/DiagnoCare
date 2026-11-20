@@ -1,0 +1,350 @@
+// DiagnoCare — relational data model.
+// Local development uses SQLite. For production switch `provider` to "postgresql";
+// the schema avoids SQLite-only features (enums are stored as validated strings,
+// structured documents as JSON text) so it migrates without changes.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────── Identity & access ─────────────
+
+model Role {
+  key         String @id // STUDENT | TEACHER | UNIVERSITY_ADMIN | PLATFORM_ADMIN
+  name        String
+  description String
+  permissions String // JSON array of permission keys (mirrors src/lib/rbac.ts)
+  users       User[]
+}
+
+model University {
+  id        String         @id @default(cuid())
+  name      String
+  country   String
+  domain    String?
+  createdAt DateTime       @default(now())
+  users     User[]
+  groups    StudentGroup[]
+  programs  TrainingProgram[]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  googleId      String?   @unique
+  avatarUrl     String?
+  emailVerifiedAt DateTime?
+  name          String
+  roleKey       String
+  role          Role      @relation(fields: [roleKey], references: [key])
+  universityId  String?
+  university    University? @relation(fields: [universityId], references: [id])
+  locale        String    @default("fr")
+  yearOfStudy   Int?
+  specialty     String?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  lastLoginAt   DateTime?
+  preferences   String    @default("{}")
+
+  subscription   Subscription?
+  payments       Payment[]
+  sessions       ConsultationSession[]
+  memberships    GroupMembership[]
+  taughtGroups   StudentGroup[]  @relation("GroupTeacher")
+  authoredCases  ClinicalCase[]  @relation("CaseAuthor")
+  assignmentsCreated Assignment[] @relation("AssignmentCreator")
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  feedbackGiven  AssessmentResult[] @relation("FeedbackTeacher")
+}
+
+model StudentGroup {
+  id           String     @id @default(cuid())
+  name         String
+  year         Int?
+  universityId String?
+  university   University? @relation(fields: [universityId], references: [id])
+  teacherId    String
+  teacher      User       @relation("GroupTeacher", fields: [teacherId], references: [id])
+  createdAt    DateTime   @default(now())
+  members      GroupMembership[]
+  assignments  Assignment[]
+}
+
+model GroupMembership {
+  id       String       @id @default(cuid())
+  groupId  String
+  group    StudentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime     @default(now())
+
+  @@unique([groupId, userId])
+}
+
+model TrainingProgram {
+  id           String     @id @default(cuid())
+  name         String
+  description  String
+  universityId String
+  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  caseSlugs    String     // JSON array of case slugs
+  createdAt    DateTime   @default(now())
+}
+
+// ───────────── Clinical content ─────────────
+
+model ClinicalCase {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  specialty       String   // see src/lib/catalog/specialties.ts
+  difficulty      String   // EASY | MEDIUM | HARD
+  summary         String   // student-facing presenting complaint (no diagnosis)
+  learningObjectives String // JSON string[]
+  estimatedMinutes Int
+  patientAge      Int
+  patientSex      String   // F | M
+  status          String   @default("DRAFT") // DRAFT | IN_REVIEW | PUBLISHED | ARCHIVED
+  freeTier        Boolean  @default(false)
+  content         String   // JSON CaseContent — authoritative source of patient facts
+  version         Int      @default(1)
+  authorId        String?
+  author          User?    @relation("CaseAuthor", fields: [authorId], references: [id])
+  reviewedBy      String?  // clinical expert reviewer name & credentials
+  reviewedAt      DateTime?
+  reviewNotes     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  patient     VirtualPatient?
+  symptoms    CaseSymptom[]
+  history     MedicalHistoryItem[]
+  rubric      EvaluationRubric?
+  sessions    ConsultationSession[]
+  assignments Assignment[]
+}
+
+model VirtualPatient {
+  id           String       @id @default(cuid())
+  caseId       String       @unique
+  case         ClinicalCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  name         String
+  age          Int
+  sex          String
+  occupation   String
+  personality  String       // persona description used by the conversation engine
+  baselineEmotion String    @default("neutral")
+  avatarConfig String       // JSON (skin tone, hair, renderer hints — 2D now, 3D-ready)
+}
+
+model CaseSymptom {
+  id      String       @id @default(cuid())
+  caseId  String
+  case    ClinicalCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  name    String
+
+  @@index([name])
+}
+
+model MedicalHistoryItem {
+  id      String       @id @default(cuid())
+  caseId  String
+  case    ClinicalCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  kind    String       // PAST_MEDICAL | MEDICATION | ALLERGY | FAMILY | SOCIAL
+  detail  String
+}
+
+model EvaluationRubric {
+  id          String       @id @default(cuid())
+  caseId      String       @unique
+  case        ClinicalCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  version     Int          @default(1)
+  criteria    String       // JSON RubricWeights
+  reviewedBy  String?
+  updatedAt   DateTime     @updatedAt
+}
+
+// ───────────── Simulation sessions ─────────────
+
+model ConsultationSession {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  caseId      String
+  case        ClinicalCase @relation(fields: [caseId], references: [id])
+  caseVersion Int
+  assignmentId String?
+  assignment  Assignment?  @relation(fields: [assignmentId], references: [id])
+  language    String       @default("fr")
+  stage       String       @default("INTERVIEW") // INTERVIEW | EXAM | INVESTIGATIONS | REASONING | MANAGEMENT | COMPLETED
+  status      String       @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED | ABANDONED
+  aiMode      String       // anthropic | demo — recorded for transparency
+  topicsCovered String     @default("[]") // JSON string[] of interview topic keys
+  notes       String       @default("")
+  startedAt   DateTime     @default(now())
+  completedAt DateTime?
+
+  messages     ConversationMessage[]
+  examinations MedicalExamination[]
+  diagnosis    DiagnosisSubmission?
+  result       AssessmentResult?
+
+  @@index([userId, status])
+}
+
+model ConversationMessage {
+  id        String              @id @default(cuid())
+  sessionId String
+  session   ConsultationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String              // student | patient | system
+  content   String
+  emotion   String?
+  topics    String?             // JSON string[] detected topics
+  createdAt DateTime            @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+model MedicalExamination {
+  id        String              @id @default(cuid())
+  sessionId String
+  session   ConsultationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  kind      String              // PHYSICAL | INVESTIGATION
+  code      String              // catalog code
+  name      String
+  result    String
+  abnormal  Boolean             @default(false)
+  createdAt DateTime            @default(now())
+
+  @@unique([sessionId, code])
+}
+
+model DiagnosisSubmission {
+  id             String              @id @default(cuid())
+  sessionId      String              @unique
+  session        ConsultationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  differentials  String              // JSON string[]
+  finalDiagnosis String
+  justification  String
+  managementActions String           @default("[]") // JSON string[] of action codes
+  managementNotes   String           @default("")
+  /// JSON RxEntry[] — optional educational prescription exercise. Never graded.
+  prescription      String           @default("[]")
+  submittedAt    DateTime            @default(now())
+}
+
+model AssessmentResult {
+  id           String              @id @default(cuid())
+  sessionId    String              @unique
+  session      ConsultationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  totalScore   Int
+  breakdown    String              // JSON ScoreBreakdown (per-criterion, transparent)
+  feedback     String              // JSON EducationalFeedback
+  feedbackSource String            // rubric | rubric+anthropic
+  rubricVersion Int
+  teacherId    String?
+  teacher      User?               @relation("FeedbackTeacher", fields: [teacherId], references: [id])
+  teacherComment String?
+  teacherScoreOverride Int?
+  createdAt    DateTime            @default(now())
+}
+
+model Assignment {
+  id          String       @id @default(cuid())
+  title       String
+  instructions String      @default("")
+  caseId      String
+  case        ClinicalCase @relation(fields: [caseId], references: [id])
+  groupId     String
+  group       StudentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  creatorId   String
+  creator     User         @relation("AssignmentCreator", fields: [creatorId], references: [id])
+  dueAt       DateTime?
+  createdAt   DateTime     @default(now())
+  sessions    ConsultationSession[]
+}
+
+// ───────────── Billing ─────────────
+
+model Subscription {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan             String    // FREE | STUDENT_PRO | UNIVERSITY
+  status           String    @default("ACTIVE") // ACTIVE | CANCELED | PAST_DUE
+  interval         String    @default("MONTH")
+  provider         String    @default("demo")
+  providerRef      String?
+  currentPeriodEnd DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amountCents Int
+  currency    String   @default("DZD")
+  plan        String
+  status      String   // SUCCEEDED | FAILED | REFUNDED | DEMO
+  provider    String
+  providerRef String?
+  description String
+  createdAt   DateTime @default(now())
+}
+
+// ───────────── Platform ─────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  href      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String?
+  entityId  String?
+  meta      String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model PlatformSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model ContactRequest {
+  id           String   @id @default(cuid())
+  kind         String   // CONTACT | DEMO
+  name         String
+  email        String
+  organization String?
+  role         String?
+  message      String
+  handled      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}

@@ -1,0 +1,112 @@
+{
+  "title": "Clinika — reel « Avant ta première garde »",
+  "format": "1080x1920, 30 images/s, ~65 s",
+  "voices": {
+    "amina": {
+      "voice": "fr-FR-VivienneMultilingualNeural",
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    },
+    "amina_dz": {
+      "voice": "ar-DZ-AminaNeural",
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    },
+    "prof": {
+      "voice": "fr-FR-HenriNeural",
+      "rate": "-3%",
+      "pitch": "+0Hz"
+    },
+    "narrator": {
+      "voice": "fr-FR-RemyMultilingualNeural",
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    }
+  },
+  "lines": [
+    {
+      "id": "l1",
+      "who": "amina",
+      "scene": "hook",
+      "text": "Quatre ans de médecine… et je n'ai jamais mené une consultation toute seule.",
+      "caption": "4 ans de médecine… jamais une consultation seule."
+    },
+    {
+      "id": "l2",
+      "who": "amina",
+      "scene": "stage",
+      "text": "En stage, on observe. Mais on n'a pas le droit de s'entraîner sur les malades.",
+      "caption": "En stage, on observe. Pas le droit de s'entraîner sur les malades."
+    },
+    {
+      "id": "l3",
+      "who": "amina",
+      "scene": "fear",
+      "text": "Et le jour de ma première garde… j'aurai peur de me tromper.",
+      "caption": "Première garde… et la peur de me tromper."
+    },
+    {
+      "id": "l4",
+      "who": "prof",
+      "scene": "prof",
+      "text": "Personne ne devrait apprendre sur un vrai patient. Entraîne-toi d'abord… sur Clinika.",
+      "caption": "Entraîne-toi d'abord… sur Clinika."
+    },
+    {
+      "id": "l5",
+      "who": "narrator",
+      "scene": "cases",
+      "text": "Quatorze cas cliniques : cardiologie, pneumologie, ophtalmologie, gynécologie… et plus encore.",
+      "caption": "14 cas cliniques, toutes les spécialités"
+    },
+    {
+      "id": "l6",
+      "who": "narrator",
+      "scene": "demo_chat",
+      "text": "Des patients virtuels algériens, qui te répondent comme aux urgences.",
+      "caption": "Des patients qui te répondent"
+    },
+    {
+      "id": "l7",
+      "who": "narrator",
+      "scene": "demo_exam",
+      "text": "Tu les examines au lit du malade : tension, auscultation, examen de l'œil.",
+      "caption": "Tension · auscultation · examen"
+    },
+    {
+      "id": "l8",
+      "who": "narrator",
+      "scene": "demo_ecg",
+      "text": "Tu lis l'ECG douze dérivations, comme en garde.",
+      "caption": "L'ECG 12 dérivations"
+    },
+    {
+      "id": "l9",
+      "who": "narrator",
+      "scene": "demo_score",
+      "text": "Et tu reçois une note détaillée, critère par critère.",
+      "caption": "Une note détaillée, critère par critère"
+    },
+    {
+      "id": "l10",
+      "who": "narrator",
+      "scene": "features",
+      "text": "Sur ton téléphone, à toute heure, à ton rythme.",
+      "caption": "Sur ton téléphone · 24h/24 · à ton rythme"
+    },
+    {
+      "id": "l11",
+      "who": "amina",
+      "scene": "happy",
+      "text": "Maintenant, je me trompe ici… pas devant un vrai malade. Le jour de ma garde, je serai prête.",
+      "caption": "Je me trompe ici… pas devant un vrai malade."
+    },
+    {
+      "id": "l12",
+      "who": "narrator",
+      "scene": "cta",
+      "text": "Clinika. Entraîne-toi avant ta première garde. C'est gratuit pour commencer.",
+      "caption": "Gratuit pour commencer"
+    }
+  ]
+}
