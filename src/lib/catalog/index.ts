@@ -71,6 +71,11 @@ export const TOPICS: Topic[] = [
   { key: "occupation", label: "Profession et contexte social", group: "Mode de vie", keywords: ["vous travaillez", "votre metier", "vous vivez", "habitez", "khedma", "work", "job", "occupation", "live with", "home", "travel", "school", "nursery", "travail", "metier", "habitez", "voyage", "ecole", "عمل", "وظيفة", "تعيش", "سفر", "مدرسة"], fallback: { en: "Nothing unusual at home or work.", fr: "Rien d'inhabituel à la maison ou au travail.", ar: "لا شيء غير عادي في البيت أو العمل." } },
   { key: "gyn", label: "Gynéco-obstétrique", group: "Antécédents", keywords: ["dernieres regles", "enceinte", "contraception", "pilule", "period", "pregnan", "menstru", "contracep", "pill", "regles", "enceinte", "grossesse", "contracept", "الدورة", "حامل", "حمل", "منع الحمل"], fallback: { en: "Nothing relevant there.", fr: "Rien de particulier.", ar: "لا شيء يذكر." } },
   { key: "ice", label: "Idées, inquiétudes et attentes", group: "Vécu du patient", keywords: ["qu'est-ce qui vous inquiete", "vous pensez que", "qu'attendez-vous", "rak khayef", "khayfa", "worried", "concern", "think it is", "expect", "afraid", "scared", "inquiet", "peur", "pensez-vous", "attendez", "قلق", "خائف", "تتوقع", "ماذا تعتقد"], fallback: { en: "I just want to know what's going on.", fr: "Je veux juste savoir ce qui se passe.", ar: "أريد فقط أن أعرف ما الذي يحدث." } },
+  { key: "mood", label: "Humeur", group: "Vécu du patient", keywords: ["votre humeur", "votre moral", "le moral", "triste", "deprim", "abattu", "humeur", "mood", "feeling down", "feel down", "feeling low", "sad", "depress", "hopeless", "desespoir", "sans espoir"], fallback: { en: "My mood is alright.", fr: "Le moral, ça va." } },
+  { key: "interest", label: "Intérêt et plaisir", group: "Vécu du patient", keywords: ["plaisir", "envie de rien", "interet", "loisirs", "ce que vous aimez", "interest", "enjoy", "pleasure", "hobbies", "motivation"], fallback: { en: "I still enjoy my usual things.", fr: "J'ai toujours plaisir à faire mes activités." } },
+  { key: "sleep", label: "Sommeil", group: "Vécu du patient", keywords: ["dormez", "sommeil", "dormir", "insomn", "reveil", "sleep", "nights", "waking"], fallback: { en: "I sleep normally.", fr: "Je dors normalement." } },
+  { key: "selfharm", label: "Idées d'auto-agression", group: "Vécu du patient", keywords: ["vous faire du mal", "se faire du mal", "suicid", "en finir", "idees noires", "envie de vivre", "mourir", "self-harm", "self harm", "harm yourself", "hurt yourself", "end your life", "kill yourself", "wanting to live", "better off dead", "want to die"], fallback: { en: "No, I've never had thoughts like that.", fr: "Non, je n'ai jamais eu ce genre d'idées." } },
+  { key: "intake", label: "Alimentation, boissons, couches", group: "Signes associés", keywords: ["il boit", "elle boit", "il mange", "elle mange", "biberon", "allaite", "tetee", "couches", "mouille", "drinking", "feeding", "breastfe", "nappies", "diapers", "wet nappy", "wet diaper", "fluids"], fallback: { en: "Eating and drinking as usual.", fr: "Il mange et boit comme d'habitude." } },
 ];
 
 export const topicByKey = (k: string) => TOPICS.find((t) => t.key === k);
@@ -155,6 +160,9 @@ export const PHYSICAL_EXAMS: ExamItem[] = [
   { code: "gyn_speculum", name: "Examen au spéculum", category: "Gynécologique", normal: "Col sain, pas de saignement ni de leucorrhées anormales." },
   { code: "gyn_tv", name: "Toucher vaginal", category: "Gynécologique", normal: "Utérus de taille normale, culs-de-sac libres et indolores." },
   { code: "obs_exam", name: "Examen obstétrical (hauteur utérine, BCF)", category: "Gynécologique", normal: "Examen obstétrical sans particularité." },
+  { code: "orthostatic", name: "Mesures orthostatiques (couché puis debout)", category: "Général", normal: "Pas de baisse significative de la pression artérielle ni de symptôme au passage debout." },
+  { code: "dre", name: "Toucher rectal et inspection des selles", category: "Abdominal", normal: "Toucher rectal indolore, selles d'aspect normal, pas de sang." },
+  { code: "mental_state", name: "Examen de l'état mental (présentation, discours, affect)", category: "Général", normal: "Présentation soignée, discours fluide, affect adapté, pas de trouble du cours de la pensée." },
 ];
 
 // ───────────── Investigations catalog ─────────────
@@ -196,6 +204,11 @@ export const INVESTIGATIONS: InvestigationItem[] = [
   { code: "sputum_tb", name: "Recherche de BK dans les crachats (GeneXpert)", category: "Microbiologie", normal: "GeneXpert MTB négatif.", turnaround: "24 h" },
   { code: "peak_flow", name: "Débit expiratoire de pointe (DEP)", category: "Explorations fonctionnelles", normal: "DEP 480 L/min (100 % de la théorique).", turnaround: "2 min" },
   { code: "spirometry", name: "Spirométrie avec test de réversibilité", category: "Explorations fonctionnelles", normal: "VEMS 98 %, VEMS/CVF 0,82, pas de réversibilité.", turnaround: "Le jour même" },
+  { code: "iron_studies", name: "Ferritine et bilan martial", category: "Biologie", normal: "Ferritine 85 µg/L, coefficient de saturation de la transferrine 30 %.", turnaround: "Le jour même" },
+  { code: "blood_film", name: "Frottis sanguin et réticulocytes", category: "Biologie", normal: "Hématies normochromes normocytaires ; réticulocytes 60 000/mm³.", turnaround: "Le jour même" },
+  { code: "b12_folate", name: "Vitamine B12 et folates", category: "Biologie", normal: "B12 et folates dans les normes du laboratoire.", turnaround: "Le jour même" },
+  { code: "ogd", name: "Fibroscopie œso-gastro-duodénale", category: "Actes", normal: "Œsophage, estomac et duodénum normaux.", turnaround: "Sur avis spécialisé" },
+  { code: "ct_abdo", name: "TDM abdomino-pelvienne", category: "Imagerie", normal: "Pas d'anomalie abdomino-pelvienne.", turnaround: "60 min" },
 ];
 
 export const examByCode = (c: string) => PHYSICAL_EXAMS.find((e) => e.code === c);

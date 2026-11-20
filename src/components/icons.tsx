@@ -113,3 +113,8 @@ export { FirstAidKit } from "@phosphor-icons/react/dist/ssr/FirstAidKit";
 export { GenderFemale } from "@phosphor-icons/react/dist/ssr/GenderFemale";
 export { Eyeglasses } from "@phosphor-icons/react/dist/ssr/Eyeglasses";
 export { Ruler } from "@phosphor-icons/react/dist/ssr/Ruler";
+export { ArrowUp } from "@phosphor-icons/react/dist/ssr/ArrowUp";
+export { ArrowDown } from "@phosphor-icons/react/dist/ssr/ArrowDown";
+export { Play } from "@phosphor-icons/react/dist/ssr/Play";
+export { HandSoap } from "@phosphor-icons/react/dist/ssr/HandSoap";
+export { Handshake } from "@phosphor-icons/react/dist/ssr/Handshake";

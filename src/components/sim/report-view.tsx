@@ -9,6 +9,7 @@ import { makeT } from "@/lib/i18n/shared";
 import { localizeCaseMeta } from "@/lib/cases/i18n";
 import { reportInLang } from "@/lib/sim/report-i18n";
 import { localizeExamRows } from "@/lib/sim/exam-text";
+import { CaseDebrief, DraftBanner, ReferencePanel, ReviewPanel } from "@/components/pedagogy";
 
 export type FullSession = ConsultationSession & {
   case: ClinicalCase;
@@ -236,6 +237,18 @@ export async function ReportView({ s, content: rawContent, actions }: { s: FullS
           </ol>
         )}
       </Card>
+
+      {rawContent.pedagogy && (
+        <Card>
+          <CardTitle sub={t("Raisonnement attendu, points à ne pas manquer, réflexion et sources", "Expected reasoning, must-not-miss points, reflection and sources")}>{t("Débriefing", "Debrief")}</CardTitle>
+          {s.case.status !== "PUBLISHED" && <DraftBanner lang={lang} className="mb-5 !text-amber-700 dark:!text-amber-100" />}
+          <CaseDebrief p={rawContent.pedagogy} lang={lang} />
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <ReviewPanel tone="theme" review={rawContent.pedagogy.review} lang={lang} live={{ status: s.case.status, version: s.case.version, reviewedBy: s.case.reviewedBy, reviewedAt: s.case.reviewedAt }} />
+            <ReferencePanel tone="theme" refs={rawContent.pedagogy.refs} lang={lang} />
+          </div>
+        </Card>
+      )}
 
       <Card>
         <details>

@@ -55,6 +55,11 @@ export const TOPIC_LABEL_EN: Record<string, string> = {
   occupation: "Occupation and social context",
   gyn: "Obstetric & gynaecological history",
   ice: "Ideas, concerns and expectations",
+  mood: "Mood",
+  interest: "Interest and pleasure",
+  sleep: "Sleep",
+  selfharm: "Thoughts of self-harm",
+  intake: "Feeding, drinking, nappies",
 };
 
 export const EXAM_CATEGORY_EN: Record<string, string> = {
@@ -108,6 +113,9 @@ export const EXAM_EN: Record<string, { name: string; normal: string }> = {
   gyn_speculum: { name: "Speculum examination", normal: "Healthy cervix, no bleeding or abnormal discharge." },
   gyn_tv: { name: "Bimanual vaginal examination", normal: "Normal-sized uterus, adnexa free and non-tender." },
   obs_exam: { name: "Obstetric examination (fundal height, fetal heart)", normal: "Unremarkable obstetric examination." },
+  orthostatic: { name: "Orthostatic measurements (lying then standing)", normal: "No significant fall in blood pressure and no symptoms on standing." },
+  dre: { name: "Rectal examination and stool inspection", normal: "Painless rectal examination, normal-looking stool, no blood." },
+  mental_state: { name: "Mental state examination (appearance, speech, affect)", normal: "Well kempt, fluent speech, appropriate affect, no thought disorder." },
 };
 
 export const INV_CATEGORY_EN: Record<string, string> = {
@@ -154,6 +162,11 @@ export const INV_EN: Record<string, { name: string; normal: string }> = {
   sputum_tb: { name: "Sputum TB test (GeneXpert)", normal: "GeneXpert MTB negative." },
   peak_flow: { name: "Peak expiratory flow (PEF)", normal: "PEF 480 L/min (100% predicted)." },
   spirometry: { name: "Spirometry with reversibility test", normal: "FEV1 98%, FEV1/FVC 0.82, no reversibility." },
+  iron_studies: { name: "Ferritin and iron studies", normal: "Ferritin 85 µg/L, transferrin saturation 30%." },
+  blood_film: { name: "Blood film and reticulocytes", normal: "Normochromic normocytic red cells; reticulocytes 60,000/mm³." },
+  b12_folate: { name: "Vitamin B12 and folate", normal: "B12 and folate within the laboratory's ranges." },
+  ogd: { name: "Upper GI endoscopy (OGD)", normal: "Normal oesophagus, stomach and duodenum." },
+  ct_abdo: { name: "CT abdomen and pelvis", normal: "No abdominopelvic abnormality." },
 };
 
-export const TURNAROUND_EN: Record<string, string> = { "Le jour même": "Same day", "7 jours": "7 days", "1 jour": "1 day" };
+export const TURNAROUND_EN: Record<string, string> = { "Sur avis spécialisé": "On specialist request", "Le jour même": "Same day", "7 jours": "7 days", "1 jour": "1 day" };

@@ -8,7 +8,8 @@
 import { PrismaClient } from "@prisma/client";
 import { ROLE_META, ROLE_PERMISSIONS, ROLES } from "../src/lib/rbac";
 import { DEMO_CASES } from "../src/lib/cases/demo-cases";
-import { upsertCase } from "../src/lib/cases/repo";
+import { seedDraftCases, upsertCase } from "../src/lib/cases/repo";
+import { DRAFT_CASES } from "../src/lib/cases/drafts";
 
 const prisma = new PrismaClient();
 
@@ -28,6 +29,8 @@ async function main() {
     });
   }
   console.log(`✓ ${DEMO_CASES.length} cas cliniques`);
+  const drafts = await seedDraftCases(prisma, DRAFT_CASES);
+  console.log(`✓ ${drafts} nouveau(x) cas brouillon(s) en relecture (${DRAFT_CASES.length} au total, jamais écrasés)`);
 
   for (const [key, value] of [["ai.patientEffort", "low"], ["ai.feedbackEffort", "medium"], ["voice.enabled", "true"]]) {
     await prisma.platformSetting.upsert({ where: { key }, create: { key, value }, update: {} });

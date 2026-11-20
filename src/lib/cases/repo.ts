@@ -76,6 +76,24 @@ export async function upsertCase(
   return row;
 }
 
+/**
+ * Seeds the source-traceable draft cases with status IN_REVIEW. Create-only: an existing row is
+ * never overwritten, so an educator's edits and approval (PUBLISHED) survive every re-seed.
+ */
+export async function seedDraftCases(db: Tx, cases: { slug: string; title: string; specialty: string; difficulty: Difficulty; summary: string; objectives: string[]; minutes: number; freeTier: boolean; content: CaseContent }[], authorId: string | null = null) {
+  let created = 0;
+  for (const c of cases) {
+    if (await db.clinicalCase.findUnique({ where: { slug: c.slug }, select: { id: true } })) continue;
+    await upsertCase(db, { slug: c.slug, title: c.title, specialty: c.specialty, difficulty: c.difficulty, summary: c.summary, objectives: c.objectives, minutes: c.minutes, freeTier: c.freeTier }, c.content, {
+      authorId,
+      status: "IN_REVIEW",
+      reviewNotes: "Brouillon sourcé — relecture par un enseignant clinicien requise avant publication. Voir le panneau « Relecture et version » du cas.",
+    });
+    created++;
+  }
+  return created;
+}
+
 export function caseContent(row: { content: string }): CaseContent {
   return parseJson<CaseContent>(row.content, null as unknown as CaseContent);
 }

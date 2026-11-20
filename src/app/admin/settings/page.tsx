@@ -17,7 +17,7 @@ export default async function AdminSettings() {
   await requireUser({ permission: "platform:settings" });
   const t = makeT(await getLang());
   const mode = aiMode();
-  const [patientEffort, feedbackEffort, voice] = await Promise.all([getSetting("ai.patientEffort"), getSetting("ai.feedbackEffort"), getSetting("voice.enabled")]);
+  const [patientEffort, feedbackEffort, voice, drafts] = await Promise.all([getSetting("ai.patientEffort"), getSetting("ai.feedbackEffort"), getSetting("voice.enabled"), getSetting("drafts.studentAccess")]);
   return (
     <>
       <PageHeader eyebrow="Configuration" title={t("Réglages IA et plateforme", "AI & platform settings")} />
@@ -37,6 +37,7 @@ export default async function AdminSettings() {
             <SettingSelect k="ai.patientEffort" label={t("Effort des réponses du patient", "Patient reply effort")} value={patientEffort} options={["low", "medium", "high"]} hint={t("Plus élevé = jeu de rôle plus nuancé, réponses plus lentes.", "Higher = more nuanced role-play, slower replies.")} />
             <SettingSelect k="ai.feedbackEffort" label={t("Effort du feedback narratif", "Narrative feedback effort")} value={feedbackEffort} options={["low", "medium", "high"]} hint={t("Effort utilisé pour rédiger le commentaire après la consultation.", "Effort used to write the comment after the consultation.")} />
             <SettingSelect k="voice.enabled" label={t("Consultations vocales", "Voice consultations")} value={voice} options={["true", "false"]} hint={t("Reconnaissance et synthèse vocales du navigateur pour Pro et Faculté.", "Browser speech recognition and synthesis for Pro and Faculty.")} />
+            <SettingSelect k="drafts.studentAccess" label={t("Accès des étudiants aux brouillons", "Student access to drafts")} value={drafts} options={["false", "true"]} hint={t("Ouvre aux étudiants les cas et ateliers sourcés encore en relecture clinique (toujours affichés « Brouillon »). Désactivé par défaut ; enseignants et administrateurs y ont toujours accès.", "Opens source-traceable cases and workshops still under clinical review to students (always labelled 'Draft'). Off by default; teachers and admins always have access.")} />
           </div>
         </Card>
         <Card className="lg:col-span-2">

@@ -42,6 +42,8 @@ export default async function ConsultPage({ params }: { params: Promise<{ id: st
     exams: localizeExamRows(s.examinations, raw, s.case.slug, lang).map((e) => ({ code: e.code, kind: e.kind as "PHYSICAL" | "INVESTIGATION", name: e.name, result: e.result, abnormal: e.abnormal, at: e.createdAt.toISOString() })),
     managementOptions: c.rubric.management.options.map((o) => ({ code: o.code, label: o.label })).sort((a, b) => a.label.localeCompare(b.label)),
     voiceAllowed: voiceEnabled && user.plan.limits.voice,
+    draft: !!raw.pedagogy && s.case.status !== "PUBLISHED",
+    contentNotice: raw.pedagogy?.contentNotice ? (lang === "en" ? raw.pedagogy.contentNotice.en : raw.pedagogy.contentNotice.fr) : undefined,
   };
   return <ConsultationRoom {...props} />;
 }

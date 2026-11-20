@@ -10,6 +10,10 @@ import { SPECIALTY_PHOTO } from "@/lib/photos";
 import { getLang, getT } from "@/lib/i18n/server";
 import { makeT } from "@/lib/i18n/shared";
 import { localizeCaseMeta, symptomName } from "@/lib/cases/i18n";
+import { DRAFT_SLUGS } from "@/lib/cases/drafts";
+import { draftsOpenToStudents } from "@/lib/sim/service";
+import { can } from "@/lib/rbac";
+import { DraftPill } from "@/components/pedagogy";
 
 export async function generateMetadata() {
   const t = await getT();
@@ -29,6 +33,11 @@ export default async function CaseLibrary({ searchParams }: { searchParams: Prom
     maxMinutes: sp.maxMinutes ? Number(sp.maxMinutes) : undefined,
     symptom: sp.symptom || undefined,
   };
+  const [drafts, draftsOpen] = await Promise.all([
+    prisma.clinicalCase.findMany({ where: { status: "IN_REVIEW", slug: { in: [...DRAFT_SLUGS] } }, orderBy: [{ specialty: "asc" }, { difficulty: "asc" }] }),
+    draftsOpenToStudents(),
+  ]);
+  const draftsPlayable = draftsOpen || can(user.roleKey, "case:write");
   const [cases, symptoms, mine] = await Promise.all([
     listPublishedCases(filters),
     prisma.caseSymptom.findMany({ distinct: ["name"], where: { case: { status: "PUBLISHED" } }, orderBy: { name: "asc" }, select: { name: true } }),
@@ -114,7 +123,42 @@ export default async function CaseLibrary({ searchParams }: { searchParams: Prom
           })}
         </div>
       )}
+      {drafts.length > 0 && !active && <DraftSection rows={drafts} lang={lang} playable={draftsPlayable} />}
     </>
+  );
+}
+
+function DraftSection({ rows, lang, playable }: { rows: Awaited<ReturnType<typeof prisma.clinicalCase.findMany>>; lang: "fr" | "en"; playable: boolean }) {
+  const t = makeT(lang);
+  return (
+    <section aria-labelledby="drafts-h" className="mt-10">
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 id="drafts-h" className="text-xl font-bold">{t("Nouveaux cas sourcés — en relecture clinique", "New source-traceable cases — under clinical review")}</h2>
+          <p className="subtle mt-1 max-w-3xl text-sm">{t("Brouillons rédigés à partir de recommandations vérifiées, avec références et métadonnées de relecture. Ils ne sont pas validés cliniquement : ", "Drafts written from verified guidelines, with references and review metadata. They are not clinically approved: ")}{playable ? t("accessibles pour relecture et test.", "available for review and testing.") : t("ils seront ouverts aux étudiants après validation par un enseignant clinicien.", "they will open to students once a clinical educator approves them.")}</p>
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {rows.map((row) => {
+          const c = localizeCaseMeta(row, lang);
+          return (
+            <Link key={c.id} href={`/app/cases/${c.slug}`} className="panel card-hover flex flex-col gap-2 rounded-2xl p-4">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="rounded-full bg-[rgb(var(--panel-2))] px-2.5 py-0.5 text-[11px] font-semibold">{specialtyName(c.specialty, lang)}</span>
+                <DraftPill lang={lang} />
+              </div>
+              <h3 className="font-semibold leading-snug">{c.title}</h3>
+              <p className="muted line-clamp-3 text-sm">{c.summary}</p>
+              <div className="subtle mt-auto flex flex-wrap items-center gap-3 pt-2 text-xs">
+                <DifficultyBadge d={c.difficulty} />
+                <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {c.estimatedMinutes} min</span>
+                {!playable && <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5" /> {t("après validation", "after approval")}</span>}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 

@@ -55,6 +55,8 @@ export const CaseContentSchema = z.object({
       .object({ history: z.number().min(0), exam: z.number().min(0), investigations: z.number().min(0), diagnosis: z.number().min(0), management: z.number().min(0) })
       .refine((w) => Math.round(w.history + w.exam + w.investigations + w.diagnosis + w.management) === 100, "La somme des pondérations doit être égale à 100"),
   }),
+  // Teaching metadata of the draft cases: kept as-is so editing a case does not drop it.
+  pedagogy: z.any().optional(),
 });
 
 export const CaseMetaSchema = z.object({

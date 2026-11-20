@@ -4,13 +4,14 @@ import { CASES_EN_A } from "./en-a";
 import { CASES_EN_B } from "./en-b";
 import type { CaseEn } from "./types";
 import { DEMO_CASES } from "../demo-cases";
+import { DRAFT_CASES, DRAFT_CASES_EN } from "../drafts";
 
 /**
  * Case content is authored in French. For English, demo cases carry a full translation
  * (below); teacher-authored cases without one fall back to the French text.
  * Translation only changes display text — codes, rubric and scoring are untouched.
  */
-const CASES_EN: Record<string, CaseEn> = { ...CASES_EN_A, ...CASES_EN_B };
+const CASES_EN: Record<string, CaseEn> = { ...CASES_EN_A, ...CASES_EN_B, ...DRAFT_CASES_EN };
 
 export const caseEn = (slug: string | null | undefined): CaseEn | undefined => (slug ? CASES_EN[slug] : undefined);
 export const hasEnglish = (slug: string | null | undefined) => !!caseEn(slug);
@@ -78,7 +79,7 @@ export function symptomName(name: string, lang: UiLang): string {
   if (lang !== "en") return name;
   if (!SYMPTOM_EN) {
     SYMPTOM_EN = new Map();
-    for (const c of DEMO_CASES) {
+    for (const c of [...DEMO_CASES, ...DRAFT_CASES]) {
       const en = caseEn(c.slug);
       if (en && en.symptoms.length === c.content.symptoms.length) c.content.symptoms.forEach((s, i) => SYMPTOM_EN!.set(s.toLowerCase().trim(), en.symptoms[i]));
     }

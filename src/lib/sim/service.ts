@@ -13,14 +13,23 @@ import { examText } from "./exam-text";
 import { localizeCaseContent } from "@/lib/cases/i18n";
 import type { UiLang } from "@/lib/i18n/shared";
 import { getSetting } from "@/lib/settings";
+import { DRAFT_SLUGS } from "@/lib/cases/drafts";
 
 export const STAGES = ["INTERVIEW", "EXAM", "INVESTIGATIONS", "REASONING", "MANAGEMENT", "COMPLETED"] as const;
 export type Stage = (typeof STAGES)[number];
 
+/** A source-traceable draft case awaiting clinical educator review (see lib/cases/drafts). */
+export const isDraftCase = (c: { status: string; slug: string }) => c.status === "IN_REVIEW" && DRAFT_SLUGS.has(c.slug);
+
+/** Whether students may open draft cases and workshops (admin setting, off by default). */
+export async function draftsOpenToStudents() {
+  return (await getSetting("drafts.studentAccess")) === "true";
+}
+
 /** Can this user open this case under their plan / role? */
-export function canAccessCase(user: CurrentUser, c: { freeTier: boolean; status: string; authorId: string | null }) {
+export function canAccessCase(user: CurrentUser, c: { freeTier: boolean; status: string; authorId: string | null; slug?: string }, draftsOpen = false) {
   if (can(user.roleKey, "case:write")) return true; // teachers/admins can preview any case
-  if (c.status !== "PUBLISHED") return false;
+  if (c.status !== "PUBLISHED" && !(draftsOpen && c.slug && isDraftCase({ status: c.status, slug: c.slug }))) return false;
   return c.freeTier || user.plan.limits.fullLibrary;
 }
 
@@ -40,7 +49,7 @@ export async function startSession(user: CurrentUser, caseId: string, lang: Lang
     if (!a) throw new HttpError(403, "Ce devoir ne vous est pas destiné");
     assigned = true;
   }
-  if (!assigned && !canAccessCase(user, c)) throw new HttpError(402, "Ce cas nécessite la formule Étudiant Pro ou un abonnement de faculté.");
+  if (!assigned && !canAccessCase(user, c, await draftsOpenToStudents())) throw new HttpError(402, "Ce cas nécessite la formule Étudiant Pro ou un abonnement de faculté.");
   const limit = user.plan.limits.simulationsPerMonth;
   if (!assigned && limit !== null && (await monthlyUsage(user.id)) >= limit) {
     throw new HttpError(402, `Votre formule inclut ${limit} simulations par mois. Passez à une formule supérieure pour continuer.`);

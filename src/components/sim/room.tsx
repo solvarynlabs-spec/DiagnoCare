@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle, ArrowLeft, ArrowRight, Brain, Check, CheckCircle2, ClipboardCheck, Clock, Baby, Drop, EyeIcon, Eyeglasses, FlaskConical, Flashlight, Gauge, GenderFemale, HandPalm, Hammer, Info, MagnifyingGlassPlus, Prescription, Syringe, Wind, Loader2, MessagesSquare, Mic, MicOff, NotebookPen, Plus, Activity, Send, SignOut, Stethoscope, Trash2, Volume2, VolumeX, X,
+  AlertTriangle, ArrowLeft, ArrowRight, Brain, Check, CheckCircle2, ClipboardCheck, Clock, Baby, Drop, EyeIcon, Eyeglasses, FlaskConical, Flashlight, Gauge, GenderFemale, HandPalm, Hammer, Info, MagnifyingGlassPlus, Prescription, Syringe, Wind, Loader2, MessagesSquare, Mic, MicOff, NotebookPen, Plus, Activity, Send, SignOut, Stethoscope, Trash2, Volume2, VolumeX, X, Pause, Play
 } from "@/components/icons";
 import { INVESTIGATIONS, PHYSICAL_EXAMS, TOPICS, localizeExam, localizeInvestigation, topicGroupLabel, topicLabel } from "@/lib/catalog";
 import { useLang, useT } from "@/lib/i18n/client";
@@ -37,6 +37,10 @@ export interface RoomProps {
   exams: { code: string; kind: "PHYSICAL" | "INVESTIGATION"; name: string; result: string; abnormal: boolean; at: string }[];
   managementOptions: { code: string; label: string }[];
   voiceAllowed: boolean;
+  /** Draft activity awaiting clinical educator review. */
+  draft?: boolean;
+  /** Sensitive-content notice: enables pause / exit and a reminder banner. */
+  contentNotice?: string;
 }
 
 const EMOTION_FR: Record<string, string> = { neutral: "calme", anxious: "anxieux", pain: "douloureux", distressed: "en détresse", tired: "fatigué", relieved: "soulagé", irritated: "agacé" };
@@ -126,6 +130,8 @@ export function ConsultationRoom(props: RoomProps) {
   const [error, setError] = useState("");
   const [engineNote, setEngineNote] = useState("");
   const [showSubmit, setShowSubmit] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(!!props.contentNotice);
   const [side, setSide] = useState<"chat" | "file" | "notes">("chat");
   const [speaking, setSpeaking] = useState(false);
   const [lastResult, setLastResult] = useState<RoomProps["exams"][number] | null>(null);
@@ -255,6 +261,12 @@ export function ConsultationRoom(props: RoomProps) {
           <p className="truncate font-display text-[15px] font-semibold text-white">{props.caseInfo.title}</p>
           <p className="truncate text-xs text-white/50">{props.caseInfo.setting}</p>
         </div>
+        {props.draft && <span className="hidden shrink-0 rounded-full border border-amber-400/60 bg-amber-400/15 px-2.5 py-0.5 text-[11px] font-semibold text-amber-100 md:inline">{t("Brouillon · relecture requise", "Draft · review required")}</span>}
+        {props.contentNotice && (
+          <button onClick={() => setPaused(true)} className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/15 px-2.5 py-1.5 text-sm text-white/80 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#6fb1ff]">
+            <Pause className="h-4 w-4" /> <span className="hidden sm:inline">{t("Pause", "Pause")}</span>
+          </button>
+        )}
         <Timer startedAt={session.startedAt} minutes={props.caseInfo.minutes} />
         <LangSwitch className="border-white/10 text-white" />
         <button onClick={() => setShowSubmit(true)} aria-label={t("Terminer la consultation", "End the consultation")} className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-red-500/70 px-3 py-1.5 text-sm font-medium text-red-300 transition hover:bg-red-500/10">
@@ -392,6 +404,29 @@ export function ConsultationRoom(props: RoomProps) {
           </div>
         </aside>
       </div>
+
+      {props.contentNotice && noticeOpen && !paused && (
+        <div role="note" className="fixed inset-x-3 bottom-3 z-[55] mx-auto max-w-xl rounded-xl border border-teal-400/40 bg-[#0b2230] p-4 text-sm text-teal-50 shadow-2xl">
+          <p className="font-semibold">{t("Avertissement de contenu", "Content notice")}</p>
+          <p className="mt-1 text-teal-50/85">{props.contentNotice}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button className="btn-primary text-sm" onClick={() => setNoticeOpen(false)}>{t("J'ai compris, continuer", "I understand, continue")}</button>
+            <button className="btn-ghost text-sm" onClick={() => setPaused(true)}><Pause className="h-4 w-4" /> {t("Pause", "Pause")}</button>
+          </div>
+        </div>
+      )}
+      {paused && (
+        <div className="fixed inset-0 z-[70] grid place-items-center bg-[#050c1a]/95 p-4" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#081427] p-6 text-white">
+            <h2 id="pause-title" className="font-display text-xl font-bold">{t("Consultation en pause", "Consultation paused")}</h2>
+            <p className="mt-2 text-sm text-white/70">{t("Prenez le temps qu'il vous faut. Rien n'est perdu : vous pouvez reprendre, ou quitter sans être noté. Si ce thème vous touche, parlez-en à une personne de confiance ou au service de santé de votre faculté.", "Take the time you need. Nothing is lost: you can resume, or leave without being scored. If this topic affects you, talk to someone you trust or your faculty's student health service.")}</p>
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              <button autoFocus className="btn-primary" onClick={() => { setPaused(false); setNoticeOpen(false); }}><Play className="h-4 w-4" /> {t("Reprendre", "Resume")}</button>
+              <button className="btn-ghost" onClick={abandon}><ArrowLeft className="h-4 w-4" /> {t("Quitter (non noté)", "Leave (not scored)")}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showSubmit && (
         <div className="fixed inset-0 z-[60] grid place-items-center p-4" role="dialog" aria-modal="true" aria-labelledby="submit-title">

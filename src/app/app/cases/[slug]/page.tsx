@@ -5,7 +5,8 @@ import { requireUser } from "@/lib/auth/session";
 import { prisma, parseJson } from "@/lib/db";
 import { caseContent } from "@/lib/cases/repo";
 import { difficultyLabel, specialtyName } from "@/lib/catalog";
-import { canAccessCase, monthlyUsage } from "@/lib/sim/service";
+import { canAccessCase, draftsOpenToStudents, isDraftCase, monthlyUsage } from "@/lib/sim/service";
+import { DraftBanner, ReferencePanel, ReviewPanel } from "@/components/pedagogy";
 import { aiMode } from "@/lib/sim/engines";
 import { Photo } from "@/components/motion";
 import type { PhotoKey } from "@/lib/photos";
@@ -37,8 +38,10 @@ export default async function CaseBrief({ params, searchParams }: { params: Prom
   const content = localizeCaseContent(caseContent(c), c.slug, lang);
   const meta = localizeCaseMeta(c, lang, parseJson<string[]>(c.learningObjectives, []));
   const assigned = assignment ? await prisma.assignment.findFirst({ where: { id: assignment, caseId: c.id, group: { members: { some: { userId: user.id } } } } }) : null;
-  const allowed = !!assigned || canAccessCase(user, c);
-  if (!allowed && c.status !== "PUBLISHED") notFound();
+  const draft = isDraftCase(c);
+  const allowed = !!assigned || canAccessCase(user, c, await draftsOpenToStudents());
+  if (!allowed && c.status !== "PUBLISHED" && !draft) notFound();
+  const ped = content.pedagogy;
   const limit = user.plan.limits.simulationsPerMonth;
   const used = await monthlyUsage(user.id);
   const overLimit = !assigned && limit !== null && used >= limit;
@@ -67,6 +70,7 @@ export default async function CaseBrief({ params, searchParams }: { params: Prom
               {c.status !== "PUBLISHED" && <span className="rounded-full border border-white/15 px-3 py-1 text-white/75">{c.status === "DRAFT" ? t("Brouillon", "Draft") : t("En relecture", "In review")}</span>}
               {assigned && <span className="rounded-full bg-white/10 px-3 py-1">{t("Devoir", "Assignment")} : {assigned.title}</span>}
             </div>
+            {ped && <DraftBanner lang={lang} approved={c.status === "PUBLISHED"} className="mt-4 max-w-2xl" />}
             <h1 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-tight sm:text-5xl">{meta.title}</h1>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/70">{meta.summary}</p>
             {complaint && (
@@ -83,7 +87,21 @@ export default async function CaseBrief({ params, searchParams }: { params: Prom
           {/* Start panel */}
           <div className="rounded-3xl border border-white/10 bg-[#081427]/85 p-6 shadow-2xl backdrop-blur-xl">
             {allowed && !overLimit ? (
-              <StartCase caseId={c.id} assignmentId={assigned?.id} aiMode={mode} />
+              <>
+                {ped?.contentNotice && (
+                  <div role="note" className="mb-4 rounded-xl border border-teal-400/40 bg-teal-400/10 p-3 text-sm text-teal-50">
+                    <p className="font-semibold">{t("Avertissement de contenu", "Content notice")}</p>
+                    <p className="mt-1 text-teal-50/85">{lang === "en" ? ped.contentNotice.en : ped.contentNotice.fr}</p>
+                  </div>
+                )}
+                <StartCase caseId={c.id} assignmentId={assigned?.id} aiMode={mode} />
+              </>
+            ) : draft && !overLimit ? (
+              <div className="text-center">
+                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/15 text-amber-200"><Lock className="h-6 w-6" /></span>
+                <p className="mt-3 text-lg font-semibold">{t("En relecture clinique", "Under clinical review")}</p>
+                <p className="mt-1 text-sm text-white/60">{t("Ce cas sera ouvert aux étudiants après validation par un enseignant clinicien.", "This case will open to students once a clinical educator has approved it.")}</p>
+              </div>
             ) : (
               <div className="text-center">
                 <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#2f86ff]/15 text-[#6fb1ff]"><Lock className="h-6 w-6" /></span>
@@ -131,6 +149,19 @@ export default async function CaseBrief({ params, searchParams }: { params: Prom
           </ol>
         </section>
 
+        {ped && (
+          <>
+            <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm lg:col-span-2">
+              <dl className="grid gap-4 sm:grid-cols-3">
+                <div><dt className="text-white/50">{t("Niveau visé", "Intended level")}</dt><dd className="mt-1">{lang === "en" ? ped.level.en : ped.level.fr}</dd></div>
+                <div><dt className="text-white/50">{t("Prérequis", "Prerequisites")}</dt><dd className="mt-1">{ped.prerequisites.map((x) => (lang === "en" ? x.en : x.fr)).join(" · ")}</dd></div>
+                <div><dt className="text-white/50">{t("Mots-clés", "Tags")}</dt><dd className="mt-1 flex flex-wrap gap-1.5">{ped.tags.map((x) => <span key={x.fr} className="rounded-full border border-white/15 px-2 py-0.5 text-xs">{lang === "en" ? x.en : x.fr}</span>)}</dd></div>
+              </dl>
+            </section>
+            <ReviewPanel review={ped.review} lang={lang} live={{ status: c.status, version: c.version, reviewedBy: c.reviewedBy, reviewedAt: c.reviewedAt }} />
+            <ReferencePanel refs={ped.refs} lang={lang} />
+          </>
+        )}
         <p className="text-xs text-white/35 lg:col-span-2">
           {t("Cas fictif à visée pédagogique", "Fictional teaching case")} · version {c.version} · {c.reviewedBy ? t(`relu par ${c.reviewedBy}`, `reviewed by ${translateMessage(c.reviewedBy, "en")}`) : t("relecture experte en attente", "expert review pending")}
         </p>

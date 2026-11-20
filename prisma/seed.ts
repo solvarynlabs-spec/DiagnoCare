@@ -13,7 +13,8 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { ROLE_META, ROLE_PERMISSIONS, ROLES } from "../src/lib/rbac";
 import { DEMO_CASES } from "../src/lib/cases/demo-cases";
-import { upsertCase } from "../src/lib/cases/repo";
+import { seedDraftCases, upsertCase } from "../src/lib/cases/repo";
+import { DRAFT_CASES } from "../src/lib/cases/drafts";
 import { scoreSession, type SessionEvidence } from "../src/lib/sim/scoring";
 import { rubricFeedback } from "../src/lib/sim/feedback";
 import { planByKey } from "../src/lib/billing/plans";
@@ -88,6 +89,8 @@ async function main() {
       }),
     );
   }
+
+  console.log(`Seeding draft cases (IN_REVIEW, create-only): ${await seedDraftCases(prisma, DRAFT_CASES, teacher.id)} new`);
 
   console.log("Seeding groups & assignments…");
   let group = await prisma.studentGroup.findFirst({ where: { name: "4e année — Groupe B" } });

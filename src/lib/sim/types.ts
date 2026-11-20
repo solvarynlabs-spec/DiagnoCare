@@ -1,3 +1,5 @@
+import type { CasePedagogy } from "@/lib/pedagogy/types";
+
 /**
  * Clinical case domain model.
  *
@@ -62,6 +64,8 @@ export interface CaseContent {
     teachingPoints: string[];
   };
   rubric: CaseRubric;
+  /** Display-only teaching metadata (sources, review, debrief) of the source-traceable draft cases. Never sent to the patient engine. */
+  pedagogy?: CasePedagogy;
 }
 
 export interface CaseRubric {
